@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			*{margin: 0;padding:0;}
+			ul{list-style: none;}
+			#box{width: 200px; margin: 20px 0;border: 1px solid #ccc;}
+			a{text-decoration: none;}
+			#box ul li a{padding-left: 10px;color: #666;}
+			.clear:after{content:"";display: block;height: 0;font-size:0;clear: both;overflow: hidden;
+			line-height: 0;width: 0;}
+			.clear{clear: both;*zoom: 1;}
+			.subMenu{display:none; margin-left:1em}
+			.hasSub>a{background-image:url(img/a1.png); background-repeat:no-repeat; background-position:left center;
+			color:#000 !important;}
+			.showSubmenu>a{background-image:url(img/a2.png); background-position:left center; background-repeat:no-repeat}
+			.ac{background-color:#efefef;}
+			.inter{width:400px;height:250px;position:relative;overflow:hidden;}
+			.in-to img{width:100%;height:100%;}
+			.on-to{position:absolute;left:0;top:0;width:340px;height:220px;background:#000;opacity:.7;text-align:center;
+				color:#FFF;line-height:35px;padding:30px 30px 0;transform:translateY(250px);transition:all .5s;z-index:1;}
+		    .picScroll{overflow:hidden;position: relative;height: 260px;width: 500px;float: left;
+			margin: 30px 10px;border: 1px dashed #CCC;}
+			.picSdiv1{float: left;position: absolute;}
+			.picSdiv1 img{float: left;}
+			.datalist{border-collapse:collapse; border:1px #000 solid; font-family:Arial, Helvetica, sans-serif; background-color:#eaf5ff; font-size:16px;}
+	        .datalist th{background-color:#4bacff; border:1px solid #0058a3; color:#FFF; font-weight:bold; padding:4px 12px; text-align:center;}
+	        .datalist td{border:1px solid #0058a3; text-align:left; padding:4px 10px;}
+	        .lot{background:#FFFF00;}
+	        .lit{background: #00FF00;}
+	        .altrow{background-color:#0CF;}
+		</style>
+		<script src="js/privte_tools.js"></script>
+		<script>
+			var weeks=["星期一","星期二","星期三","星期四","星期五","星期六","星期日"];
+			obj_tools.documentReady(function(){
+				(function(){
+					var oDiv = document.getElementById("dot");
+					var oDel = oDiv.getElementsByTagName("div");
+					var timer=null;
+					obj_tools.mouseEnter(oDiv, function () {
+						timer=setInterval(function() {
+							oDel[1].style.transform = "translateY(0)";
+						},300);
+						console.log("进来了");
+					});
+					obj_tools.mouseLeave(oDiv, function () {
+						oDel[1].style.transform = "translateY(250px)";
+						clearInterval(timer);
+						console.log("出来了");
+					});
+				})();
+				(function(){
+					var documentFrag=document.createDocumentFragment();
+					var oUl=document.createElement("ul");
+					oUl.className="clear";
+					for(var i=0;i<weeks.length;i++){
+						var oLi=document.createElement("li");
+						oLi.innerHTML=weeks[i];
+						oUl.appendChild(oLi);
+					}
+					documentFrag.appendChild(oUl);
+					document.body.appendChild(documentFrag);
+				})();
+				(function(){
+					var oBox=document.getElementById("box");
+					var oLi=oBox.getElementsByTagName("li");
+					var oa=oBox.getElementsByTagName("a");
+					for(var i=0;i<oLi.length;i++){
+						oLi[i].show=true;
+						var oUl=oLi[i].children[1];
+						if(oUl){
+							oUl.className="subMenu";
+							oLi[i].className="hasSub";
+						}
+					
+						oLi[i].onclick=function(e){
+							var ev=e||event;
+							ev.cancelBubble=true;
+							oUl=this.children[1];
+							if(this.show){
+								if(oUl){
+									oUl.style.display="block";
+									this.className="hasSub showSubmenu";
+									this.show=false;
+								}
+							}else{
+								oUl.style.display="none";
+								this.className="hasSub";
+								this.show=true;
+							}
+							for(var i=0;i<oLi.length;i++){
+								oa[i].className="";
+							}
+							this.children[0].className="ac";
+						};
+					}
+				})();
+				(function(){
+					var oForm=document.forms["form1"];
+					var oInput = oForm.getElementsByTagName("input")[0];
+				    var oDiv = oForm.getElementsByTagName("div")[0];
+				    var oInt = oDiv.getElementsByTagName("input");
+				    var n=0;
+				    for(var i=0;i<oInt.length;i++){	
+					    oInput.onclick=function(){
+					    	for(var i=0;i<oInt.length;i++){	
+					    		if(this.checked){
+					    			oInt[i].checked=true;
+					    			n=oInt.length;
+					    		}else{
+					    		    oInt[i].checked=false;
+					    		    n=0;
+					    		}
+					    	}
+					    };
+				   
+				   	   oInt[i].onclick=function(){
+				    	  if(this.checked)
+				    	     n++;
+				    	  else
+				    	     n--;
+				    	  if(n==oInt.length)
+				    	     oInput.checked=true;
+				    	  else
+				    	  	 oInput.checked=false;
+				       }
+				    }
+				})();
+				(function(){
+					var picS = document.getElementById("picScroll");
+				    var uDiv = picS.getElementsByTagName("div")[0];
+				    var oImg = uDiv.getElementsByTagName("img");
+				    var f=oImg.length*400;
+				    var n=0;
+				    var timer=null;
+				    
+				    uDiv.style.width=f*2+"px";
+					uDiv.innerHTML+=uDiv.innerHTML;
+					
+					clearInterval(timer);
+					function mquree(){
+						if(n<-f)
+							n=0;
+						uDiv.style.left=n+"px";
+						n-=30;
+					}
+					timer=setInterval(mquree,30);
+					uDiv.onmouseover=function(){
+						clearInterval(timer);
+					};
+					uDiv.onmouseout=function(){
+						timer=setInterval(mquree,30);
+					}
+				})();
+				(function(){
+					var obody=document.getElementsByTagName("tbody")[0];
+            		var otr=obody.getElementsByTagName("tr");
+            		for(var i=0;i<otr.length;i++){
+            			otr[i].onmouseover=function(){
+            				this.className=(this.className=="lot")?"lot altrow":"lit altrow";
+            			};
+            			otr[i].onmouseout=function(){
+            				this.className=(this.className=="lot altrow")?"lot":"lit";
+            			};
+            			otr[i].className=i%2?"lot":"lit";
+            		}
+				})();
+			});
+		</script>
+	</head>
+	<body>
+		<div class="inter" id="dot">
+			<div class="in-to"><img src="img/background/personal4.jpg"></div>
+			<div class="on-to">每当到夜幕降临的时候，总有一些无法安睡的生物，他们近近的呆在黑暗里，潜伏在一抹光线下</div>
+		</div>
+		<div id="box">
+			<ul>
+				<li><a href="javascript:(0);">一级菜单</a>
+					<ul>
+						<li><a href="javascript:(0);">二级菜单</a>
+							<ul>
+								<li><a href="javascript:(0);">三级菜单</a></li>
+								<li><a href="javascript:(0);">三级菜单</a></li>
+								<li><a href="javascript:(0);">三级菜单</a></li>
+								<li><a href="javascript:(0);">三级菜单</a></li>
+								<li><a href="javascript:(0);">三级菜单</a></li>
+							</ul>
+						</li>
+						<li><a href="javascript:(0);">二级菜单</a></li>
+						<li><a href="javascript:(0);">二级菜单</a></li>
+						<li><a href="javascript:(0);">二级菜单</a></li>
+						<li><a href="javascript:(0);">二级菜单</a></li>
+					</ul>
+				</li>
+				<li><a href="javascript:(0);">一级菜单</a></li>
+				<li><a href="javascript:(0);">一级菜单</a>
+					<ul>
+						<li><a href="javascript:(0);">二级菜单</a>
+							<ul>
+								<li><a href="javascript:(0);">三级菜单</a>
+								 <ul>
+								 	<li><a href="javascript:(0);">四级菜单</a></li>
+									<li><a href="javascript:(0);">四级菜单</a></li>
+									<li><a href="javascript:(0);">四级菜单</a></li>
+									<li><a href="javascript:(0);">四级菜单</a></li>
+								 </ul>			
+								</li>	
+							</ul>
+						</li>
+					</ul>	
+				</li>
+				<li><a href="javascript:(0);">一级菜单</a></li>
+				<li><a href="javascript:(0);">一级菜单</a></li>
+			</ul>
+		</div>
+		<form name="form1">
+         <label><input type="checkbox">全选/全不选</label>
+         <div>
+	                兴趣爱好：<br>
+	             <label><input type="checkbox">篮球</label>
+	             <label><input type="checkbox">足球</label>
+	             <label><input type="checkbox">冰球</label>
+	             <label><input type="checkbox">羽毛球</label>
+	             <label><input type="checkbox">乒乓球</label>
+	             <label><input type="checkbox">排球</label>
+	     </div>
+	    </form>
+	    <div id="picScroll" class="picScroll">
+            <div class="picSdiv1">
+                <img src="img/01.jpg" />
+                <img src="img/02.jpg" />
+                <img src="img/03.jpg" />
+                <img src="img/04.jpg" />
+                <img src="img/05.jpg" />
+            </div>
+        </div>
+        <table border="0" width="500" height="400" class="datalist" id="dot">
+		   <caption>成员列表</caption>
+		    <thead>
+		     <tr>
+		        <th id="tld0">名字</th>
+		        <th id="tld1">班级</th>
+		        <th id="tld2">生日</th>
+		        <th id="tld3">星座</th>
+		        <th id="tld4">手机号</th>
+		     </tr>
+		    </thead>
+		
+		    <tbody>
+		    <tr>
+		        <td id="tld6">isaac</td>
+		        <td id="tld7">W13</td>
+		        <td id="tld8">6.24</td>
+		        <td id="tld9">巨蟹</td>
+		        <td id="tld10">1118159</td>
+		    </tr>
+		
+		    <tr>
+		        <td id="tld11">girfwing</td>
+		        <td id="tld12">W210</td>
+		        <td id="tld13">2.16</td>
+		        <td id="tld14">金牛</td>
+		        <td id="tld15">1307994</td>
+		    </tr>
+		
+		    <tr>
+		        <td id="tld16">tastertory</td>
+		        <td id="tld17">W15</td>
+		        <td id="tld18">3.29</td>
+		        <td id="tld19">狮子</td>
+		        <td id="tld20">1095324</td>
+		    </tr>
+		
+		    <tr>
+		        <td id="tld21">lovehate</td>
+		        <td id="tld22">W45</td>
+		        <td id="tld23">5.5</td>
+		        <td id="tld24">摩羯</td>
+		        <td id="tld25">6098017</td>
+		    </tr>
+		
+		    <tr>
+		        <td id="tld26">isaac</td>
+		        <td id="tld27">W13</td>
+		        <td id="tld28">6.24</td>
+		        <td id="tld29">巨蟹</td>
+		        <td id="tld30">1118159</td>
+		    </tr>
+		
+		    <tr>
+		        <td id="tld31">slepox</td>
+		        <td id="tld32">W19</td>
+		        <td id="tld33">1.18</td>
+		        <td id="tld34">水瓶</td>
+		        <td id="tld35">0658635</td>
+		    </tr>
+		
+		    <tr>
+		        <td id="tld36">smartlau</td>
+		        <td id="tld37">W210</td>
+		        <td id="tld38">7.30</td>
+		        <td id="tld39">双鱼</td>
+		        <td id="tld40">1851918</td>
+		    </tr>
+		
+		    <tr>
+		        <td id="tld41">whaler</td>
+		        <td id="tld42">W25</td>
+		        <td id="tld43">8.18</td>
+		        <td id="tld44">双鱼</td>
+		        <td id="tld45">0621827</td>
+		    </tr>
+		
+		    <tr>
+		        <td id="tld46">shenhuanyan</td>
+		        <td id="tld47">W91</td>
+		        <td id="tld48">5.31</td>
+		        <td id="tld49">双子</td>
+		        <td id="tld50">0091704</td>
+		    </tr>
+		
+		    <tr>
+		        <td id="tld51">tuonene</td>
+		        <td id="tld52">W19</td>
+		        <td id="tld53">2.26</td>
+		        <td id="tld54">白羊</td>
+		        <td id="tld55">0468357</td>
+		    </tr>
+		    </tbody>
+		</table>
+	</body>
+</html>

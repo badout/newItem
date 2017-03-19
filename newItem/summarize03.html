@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+    	body{font-size: "Microsoft YaHei";height:10000px;position: relative;}
+    	*{margin:0;padding:0;}
+    	ul{list-style: none;}
+    	/**
+    	 * 天气预报
+    	 */
+    	/**
+    	 * 仿网易登录
+    	 */
+    	#nav{height: 50px;background: #000;margin:20px 0;}
+    	#nav li{float: left;position: relative;}
+    	#nav li a{display: block;padding:0 40px;line-height:50px;text-align:center;background: #FF0000;
+    	margin-left: 20px;text-decoration: none;color: #fff;}
+    	#nav div{width: 300px;height: 300px;position: absolute;border: 1px solid #ccc;left: 20px;
+    	top: 60px;box-shadow: 0 0 10px #ccc;-webkit-box-shadow: 0 0 10px #ccc;
+    	-moz-box-shadow: 0 0 10px #ccc;display: none;background: #fff;}
+    	/**
+    	 * 选项卡
+    	 */
+    	#tabBox {width: 580px;height: 520px;margin: 100px auto 0;}
+		#tabBox h2 {font-size: 41px;color: #464244;line-height: 71px;color:#00E0FC;}
+		#tabs ul {height: 31px;border-left: #999999 solid 1px;border-bottom: #999999 solid 1px;}
+		#tabs ul li {float: left;border-top: #999999 solid 1px;border-right: #999999 solid 1px;}
+		#tabs ul li a {display: block;padding: 0 12px;line-height: 29px;border: white solid 1px;border-bottom: none;
+		background-color: #e0e0e0;color: #271d1e;text-decoration: none;font-size: 14px;}
+		/*当一个标题a获得焦点时的样式*/
+		#tabs ul li .current {border-bottom: white solid 1px;background-color: white;}
+		#content {border: #999999 solid 1px;border-top: none;height: 357px;background: lightyellow;}
+		#content h3 {line-height: 47px;font-size: 22px;color: #434142;border-bottom: #e2e2e2 dashed 1px;
+		margin-bottom: 10px;}
+		/*让一开始，所有的内容面板隐藏*/
+		#content>div {padding: 9px 20px 17px 20px;display: none;}
+		#content>div>div {padding: 5px;border: #dddddd solid 1px;margin-right: 18px;margin-bottom: 33px;float: left;}
+		#content p {color: #999999;font-size: 12px;line-height: 21px;}
+		/**
+		 * 图像缩放
+		 */
+		.container {width: 600px;height: 600px;margin: 50px auto auto auto;}
+        .photos li {display: inline-block;width: 290px;height: 250px;background-color: #E1E1E1;
+         margin: 0 5px 5px 0;overflow: hidden;position: relative;cursor: pointer;}
+        .photos li img {top: -50%;left: -50%;position: absolute;opacity: 0.5;}
+        /**
+         * 动画背景图像
+         */
+        .background{background: url("img/splash01.jpg") center center fixed;background-repeat: no-repeat;
+        -webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;
+        position: absolute;top: 0;bottom: 0;left: 0;right: 0;z-index: -1;}	
+    </style>
+    <script src="js/jquery-3.1.0.js"></script>
+ 	<script src="js/jquery.easing.min.js"></script>
+ 	<script>
+		$(function(){
+			/**
+             * 天气预报
+             */
+            (function(){
+            	
+            })();
+        	/**
+        	 * 级联菜单
+        	 */
+        	//避免全局污染，使用工厂模式或者自运行或者原型
+            var itemAs={
+            	cities:["广东省","广西省"],
+		    	str:"南宁市,柳州市,桂林市,贵港市,郴州市",
+		    	str1:"深圳市,广州市,韶关市,东莞市,珠海市",
+            	$shi:$("select[name='cities']"),
+            	$shengMing:$("select[name='sheng']"),
+            	setMoves:function(){
+			    	this.cities["广东省"]=["深圳市","广州市","韶关市","东莞市","珠海市"];
+				    this.cities["广西省"]=["南宁市","柳州市","桂林市","贵港市","郴州市"];	
+		    	}
+            };
+            itemAs.setMoves();
+            for (var i = 0; i < itemAs.cities.length; i++) {
+    			$("<option>").append(itemAs.cities[i]).
+    				attr("value",itemAs.cities[i]).appendTo($(itemAs.$shi));
+            }
+            itemAs.$shi.on("change",function(){
+            	var prov=$(this).val();
+            	var $sheng=$("select[name='sheng']");
+            	var $xian=$("select[name='xian']");
+            	$sheng.empty();
+            	$xian.empty();
+            	isClick($sheng,prov,"<option>请选择省市名</option>");
+            	$xian.append("<option>请选择县城名</option>");
+            	itemAs.$shengMing.on("change",function(){
+            		var prev=$(this).val();
+            		setChoies(prev);
+            		isClick($xian,prev,"<option>请选择县城名</option>");
+            	});
+            });
+            //匹配当前点击的值选项
+            function isClick(now,value,str){
+            	now.empty();
+        		now.append(str);
+        		if(value){
+        			var nowValue=itemAs.cities[value];
+        			if(nowValue!=null){
+            			for(var i = 0; i < nowValue.length; i++) {
+							$("<option>").text(nowValue[i]).appendTo($(now));
+            			}
+        			}
+        		}
+            }
+            //获取三级选项菜单
+            function setChoies(prev){
+	        	for (var i = 0; i < itemAs.str.length; i++) {
+	        		if(prev == setSplice(itemAs.str,i)){
+	        			itemAs.cities[prev]=[
+							"全州县","兴安县","灵川县","资源县","灌阳县","临桂县"
+						];
+	        		}else if(prev == setSplice(itemAs.str1,i)){
+	        			itemAs.cities[prev]=[
+							"广宁县","德庆县","封开县","怀集县","遂溪县","徐闻县"
+						];
+	        		}
+	        	}
+    		}
+            //匹配二级菜单
+            function setSplice(str,num){
+	    		var strLi=str.split(",");
+    			return strLi[0+num];
+	    	}
+            /**
+             * 仿网易登录
+             */
+            var $login=$("#nav li");
+            var $loginform=$(".loginform");
+            var timer=null;
+            $login.eq(0).find("a").on({"mouseover":function(){
+            	 clearTimeout(timer);
+            	 $(this).next().show();
+            },"mouseout":function(){
+            	 var _this=$(this);
+            	 function time_out(){
+            	 	_this.next().hide();	
+            	 }
+            	 timer=setTimeout(time_out,500);
+            }});
+            $loginform.on("mouseover",function(){
+            	clearTimeout(timer);
+            }).on("click",function(e){
+            	e.stopPropagation()?e.stopPropagation():e.preventDefault();
+            });
+            $(document).on("click",function(){
+            	$loginform.hide();
+            });
+            /**
+             * 图片放大效果
+             */
+            var $box=$("#box1");
+            $("#btn1").on("click",function(){
+            	$box.animate({width:$box.width()*2,height:$box.height()*2},1000);
+            });
+            $("#btn2").on("click",function(){
+            	$box.css({border:"3px dashed #000",position:"relative"})
+            		.animate({top:$(window).height()-$box.height()-$box.position().top-10
+            		,"border-radius":"100%",opacity:0},3000,"easeInOutQuint");
+            });
+            $("#btn3").on("click",function(){
+            	var oldTop=$box.position().top;
+            	var oldLeft=$box.position().left;
+            	var oldWidth=$box.width();
+            	var oldHeight=$box.height();
+            	$box.css({border:"3px dashed #000",position:"absolute",top:oldTop,left:oldLeft})
+            		.animate({width:oldWidth*4,
+            				height:oldHeight*4,
+            				left:oldLeft+oldWidth/2,
+            				top:oldTop-oldHeight/2,
+            				"border-radius":"100%",	
+            				opacity:"hide"},3000,"easeInCubic");
+            });
+            $("#btn4").on("click",function(){
+            	$box.css({width:"auto",height:"auto",opacity:1,
+            		left:"auto",top:"auto",border:"none",
+            		"border-radius":0,display:"block"}).stop();
+            });
+            /**
+             * tab选项卡
+             */
+            var $content=$("#content>div");
+            //先显示第一张图片
+            $content.eq(0).show();
+            $("#tabs li").each(function(index){
+            	$(this).on("mouseover",function(){
+            		//添加类让a标签获得焦点
+					$(this).children().addClass("current");
+					//让其他的兄弟元素下的a失去焦点
+					$(this).siblings().children().removeClass();
+					//让div单个显示并隐藏其他兄弟元素
+					$content.eq(index).stop().fadeIn(200).siblings().hide();
+            	});
+            });
+            /**
+             * 图像缩放
+             */
+            var imgs=[];
+            $(".photos li").each(function(index){
+            	$(this).hover(
+				  function(){
+				 	  var $img=$(this).find("img");
+				 	  //移进鼠标时加载直接完成
+				  	  $img.finish();
+				 	  //存储默认图片的宽和高
+				 	  imgs[index]={width:$img.width(),height:$img.height()};
+				  	  $img.animate({
+				  	  	width:290,height:250,opacity:1,left:0,top:0
+				  	  },"slow");
+				  },
+				  function(){
+				  	  var $img=$(this).find("img");
+				  	  $img.animate({
+				  	  	width:imgs[index].width,
+				  	  	height:imgs[index].height,
+				  	  	top:"-50%",left:"-50%",opacity:.5
+				  	  },"slow");
+				  }
+            	);
+            });
+            /**
+             * 动画背景图像
+             */
+            var imges=["img/splash01.jpg","img/splash02.jpg","img/splash03.jpg","img/contact.jpg",
+                   "img/image1.jpg","img/image2.jpg"];
+            var index=1;
+            var time=null;
+            clearTimeout(time);
+            time=setTimeout(animateImg,3000);
+            function animateImg(){
+            	if(index>imges.length-1) index=0;
+	            $(".background").animate({opacity:0},600,function(){
+	            	$(this).css({"background-image":"url("+imges[index]+")"})
+	            		.animate({opacity:1},800);
+	            	index++;
+	            });		
+	            time=setTimeout(animateImg,3000);
+            }
+            window.onunload=function(){
+            	clearTimeout(time);
+            	clearInterval(timer);
+            };
+            /**
+             * 获取json
+             */
+            var urL="json/new_json.json";
+            /*$.getJSON(urL,function(data){
+            	$("#getJson").html(data.name+","+data.age+","+data.work);
+            });	//第一种方法*/
+            $.ajax({
+            	url:urL,
+            	dataType:"json",
+            	success:function(data){
+            		$("#getJson").html(data.name+","+data.age+","+data.work);
+            	},
+            	error:function(xhr){
+            		$("#getJson").html(xhr.responseText);
+            	}
+            }); //第二种方法
+		});
+    </script>
+</head>
+<body>
+    <!--天气预报-->
+	<!--<div class="weather_search">
+		<button type="button" id="box1">天气查询</button>
+		<div id="box2"><img src="img/ajax-loader.gif" alt=""></div>
+		<p></p>
+		<ul class="weather">
+		    <li class="left"></li>
+		    <li></li>
+		    <li></li>
+		    <li></li>
+		    <li></li>
+		    <li></li>
+		    <li></li>
+		</ul>
+	</div>-->
+	<!--级联菜单-->
+	<div id="levelMenu" class="levelMenu">
+		<select name="cities" id="">
+			<option value="">请选择城市名</option>
+		</select>
+		<select name="sheng" id="">
+			<option value="">请选择省市名</option>
+		</select>
+		<select name="xian" id="">
+			<option value="">请选择县城名</option>
+		</select>
+	</div>
+	<!--仿网易登录-->
+    <ul id="nav">
+        <li>
+            <a href="#">登录</a>
+            <div class="loginform">登录表单部分</div>
+        </li>
+        <li>
+            <a href="#">other</a>
+            <div class="other">any content</div>
+        </li>
+    </ul>
+    <!--图片放大效果-->
+    <div>
+	    <button id="btn1">放大</button>
+	    <button id="btn2">放大并破裂</button>
+	    <button id="btn3">放大</button>
+	    <button id="btn4">重置</button>
+	</div>
+	<div> 
+	  <img src="img/background/personal3.png" id="box1">
+	</div>
+	<!--选项卡-->
+	<div id="tabBox">
+    <h2>简单的选项卡切换效果</h2>
+    <div id="tabs">
+        <ul>
+            <li><a href="#" class="current">Tab1</a></li>
+            <li><a href="#">Tab2</a></li>
+            <li><a href="#">Tab3</a></li>
+            <li><a href="#">Tab4</a></li>
+        </ul>
+        <div id="content">
+            <div>
+                <h3>选项卡1</h3>
+                <div><img src="img/pic1.gif"/></div>
+                <p>内容11111:Saw polecat than took bankrupt good hillbilly stew, crazy, fancy and hillbilly heap rodeo, pappy.
+                    Thar range saw me him sherrif nothin' shiney dirt, pigs sheep city-slickers everlastin' shotgun
+                    driveway. Promenade catfight fart fiddle jiggly gonna tarnation, fence, what quarrel dirty, if. Pot
+                    grandma crop kinfolk jezebel diesel coonskin hoosegow wirey fixin' shack good roped in. Reckon stew
+                    tax-collectors, grandpa tobaccee hayseed good wash tired caboodle burnin' landlord.</p>
+                <p>
+                    Smokin' driveway wrestlin' go darn truck moonshine wirey cow grandpa saw, coonskin bull, java,
+                    huntin'.</p>
+            </div>
+            <div>
+                <h3>选项卡2</h3>
+                <div><img src="img/pic2.gif"/></div>
+                <p>内容22222:Saw polecat than took bankrupt good hillbilly stew, crazy, fancy and hillbilly heap rodeo, pappy.
+                    Thar range saw me him sherrif nothin' shiney dirt, pigs sheep city-slickers everlastin' shotgun
+                    driveway. Promenade catfight fart fiddle jiggly gonna tarnation, fence, what quarrel dirty, if. Pot
+                    grandma crop kinfolk jezebel diesel coonskin hoosegow wirey fixin' shack good roped in. Reckon stew
+                    tax-collectors, grandpa tobaccee hayseed good wash tired caboodle burnin' landlord.</p>
+                <p>
+                    Smokin' driveway wrestlin' go darn truck moonshine wirey cow grandpa saw, coonskin bull, java,
+                    huntin'.</p>
+            </div>
+            <div>
+                <h3>选项卡3</h3>
+                <div><img src="img/pic3.gif"/></div>
+                <p>内容33333:Saw polecat than took bankrupt good hillbilly stew, crazy, fancy and hillbilly heap rodeo, pappy.
+                    Thar range saw me him sherrif nothin' shiney dirt, pigs sheep city-slickers everlastin' shotgun
+                    driveway. Promenade catfight fart fiddle jiggly gonna tarnation, fence, what quarrel dirty, if. Pot
+                    grandma crop kinfolk jezebel diesel coonskin hoosegow wirey fixin' shack good roped in. Reckon stew
+                    tax-collectors, grandpa tobaccee hayseed good wash tired caboodle burnin' landlord.</p>
+                <p>
+                    Smokin' driveway wrestlin' go darn truck moonshine wirey cow grandpa saw, coonskin bull, java,
+                    huntin'.</p>
+            </div>
+            <div>
+                <h3>选项卡4</h3>
+                <div><img src="img/pic4.gif"/></div>
+                <p>内容44444:Saw polecat than took bankrupt good hillbilly stew, crazy, fancy and hillbilly heap rodeo, pappy.
+                    Thar range saw me him sherrif nothin' shiney dirt, pigs sheep city-slickers everlastin' shotgun
+                    driveway. Promenade catfight fart fiddle jiggly gonna tarnation, fence, what quarrel dirty, if. Pot
+                    grandma crop kinfolk jezebel diesel coonskin hoosegow wirey fixin' shack good roped in. Reckon stew
+                    tax-collectors, grandpa tobaccee hayseed good wash tired caboodle burnin' landlord.</p>
+                <p>
+                    Smokin' driveway wrestlin' go darn truck moonshine wirey cow grandpa saw, coonskin bull, java,
+                    huntin'.</p>
+            </div>
+         </div><!--end content-->
+  	  </div><!--end tabs-->
+	</div>
+	<!--图像缩放-->
+    <div class="container">
+        <ul class="photos">
+            <li><img src="img/countryside01.jpg" alt="Countryside 1" /></li>
+            <li><img src="img/countryside02.jpg" alt="Countryside 2" /></li>
+            <li><img src="img/countryside03.jpg" alt="Countryside 3" /></li>
+            <li><img src="img/countryside04.jpg" alt="Countryside 4" /></li>
+        </ul>
+    </div>
+    <!--动画背景图像-->
+    <div class="background"></div>
+    <!--获取json-->
+    <div id="getJson"></div>
+</body>
+</html>

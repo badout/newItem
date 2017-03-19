@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			*{margin: 0;padding: 0;}.clear:after{content:"";display:block;overflow:hidden;visibility:hidden;font-size:0;line-height:0;width:0;height:0;clear: both;}
+        	.clear{*zoom:1;clear: both;}
+			.box{width: 200px;height: 200px;position: absolute;top:10px;left:10px;cursor: move;
+			z-index: 1;}
+			.box .t{width: 100%;height: 10px;position:absolute;top: 0;left: 0;background: #666;cursor: row-resize;}
+			.box .r{width: 10px;height: 100%;position:absolute;top: 0;right: 0;background: #666;cursor: col-resize;}
+			.box .b{width: 100%;height: 10px;position:absolute;bottom: 0;left: 0;background: #666;cursor: row-resize;}
+			.box .l{width: 10px;height: 100%;position:absolute;top: 0;left: 0;background: #666;cursor: col-resize;}
+			
+			.box .tl{width:20px;height: 20px;position: absolute;top: -5px;left: -5px;background: #ccc;cursor: nwse-resize;}
+			.box .tr{width:20px;height: 20px;position: absolute;top: -5px;right: -5px;background: #ccc;cursor: nesw-resize;}
+			.box .br{width:20px;height: 20px;position: absolute;bottom: -5px;right: -5px;background: #ccc;cursor: nwse-resize;}
+			.box .bl{width:20px;height: 20px;position: absolute;bottom: -5px;left: -5px;background: #ccc;cursor: nesw-resize;}
+			.box img{width: 100%;height: 100%;display: block;}
+			
+			/*滚动条*/
+			#box{width: 400px;height: 400px;border: 1px solid #ccc;position: relative;overflow:hidden;padding-right: 30px;
+			margin:20px auto;}
+	        #box div{width:15px;height: 150px;background: #6666FF;position: absolute;right: 0;top:0;cursor: auto;}
+	        #box p{margin-right: 30px;position: absolute;left: 0;top: 0;}
+	        
+	        /*下拉列表*/
+	        #bot{width: 200px;height: 30px;border: 1px solid #666;position: relative;margin:20px;z-index: 1; }
+        	#bot ul{list-style: none;position: absolute;min-width: 200px;left: 0;top: 30px;}
+	        .in{width: 0;height: 0;border-top:5px solid #000;border-left: 5px solid transparent;
+	            border-right:5px solid transparent;position: absolute;right:7px ;top: 12px;}
+	        .on{width: 0;height: 0;border-bottom:5px solid #000;border-left: 5px solid transparent;
+	            border-right:5px solid transparent;position: absolute;right:7px ;top: 12px;}
+	        .color{background: #00aaff;color:#fff;}
+	        #bot h5{text-indent: 1em;padding-top: 6px;font-size: 16px;}
+	        #bot ul{list-style: none;position: absolute;border:1px solid #000;display: none;}
+	        #bot ul li{height: 40px;line-height: 40px;text-indent: 1em;}
+	        #far{display: none;position: fixed;left: 0;top:0;width: 100%;height: 100%;}
+			
+			/*鼠标移动到图片放大*/
+			#imgBigLong {position:fixed; bottom:0; width:100%; text-align:center;}
+			
+			/*双色球开奖*/
+			#draw{max-width: 600px;min-height: 400px;margin: 100px auto;text-align: center;border: 1px solid red;padding: 20px;}
+	        #draw h1{padding:30px 0;}
+	        #draw ul{list-style: none;margin-left: 20px;}
+	        #draw ul li{float: left;padding: 17px;border: 2px solid red;margin:10px;font-size: 30px;}
+	        #draw button{max-width: 150px;padding: 10px 20px;margin: 20px 0;}
+	        #draw p{ word-break:break-all; font-size:20px;line-height: 30px;padding-left: 10px;}
+	        
+	        /*二维数组*/
+	        .twoArr table{border-collapse: collapse;}
+	        .twoArr th,.twoArr tr{width: 100px;border: 1px solid #ccc;height: 40px;}
+	        .twoArr td{border: 1px solid #ccc;text-align: center;}
+	        
+	        /*切换类*/
+	       .onBox{max-width: 600px;border-bottom: 1px solid #ccc;}
+	       .onBox button{float:left;max-width: 150px;padding: 20px 40px;margin: 10px 10px 10px 0;}
+	       .show{display: block;background: #FF0000;width: 600px;height:200px;font-size: 25px;color:#fff;}
+	       .hide{display: none;}
+		</style>
+		<script src="js/privte_tools.js"></script>
+		<script>
+			 obj_tools.documentReady(function(){
+			 	 (function(){
+			 	 	var oDiv = document.getElementsByTagName('div')[0];
+	            	var aSpan = oDiv.getElementsByTagName('span');
+	             	var oImg = oDiv.getElementsByTagName("img")[0];
+			 	
+			 	 for(var i=0;i<aSpan.length;i++){
+			 	 	 dragFn(aSpan[i]);
+			 	 }
+			 	 
+			 	 oImg.onmousedown=function(e){
+			 	 	var ev=e||event;
+			 	 	var tempY = ev.clientY - oDiv.offsetTop;
+	                var tempX = ev.clientX - oDiv.offsetLeft;
+	                document.onmousemove = function (e) {
+	                	var ev=e||event;
+	                    var x = ev.clientX - tempX;
+	                    var y = ev.clientY - tempY;
+	                    var c_W = document.documentElement.clientWidth - oDiv.offsetWidth;
+	                    var c_H = document.documentElement.clientHeight - oDiv.offsetHeight;
+	                    if (y > c_H-5)
+	                        y = c_H-5;
+	                    if (y < 5)
+	                        y = 5;
+	                    if (x > c_W-5)
+	                        x = c_W-5;
+	                    if (x < 5)
+	                        x = 5;
+	                    oDiv.style.left = x + "px";
+	                    oDiv.style.top = y + "px";
+	                };
+	                document.onmouseup = function (e) {
+	                    this.onmousemove = null;
+	                    e.cancelBubble=true;
+	                };
+	                return false;
+			 	 };
+			 	 
+			 	 function dragFn(obj){
+			 	 	 obj.onmousedown=function(e){
+			 	 	 	 var ev=e||event;
+			 	 	 	 
+			 	 	 	 //记录盒子原始的宽度和高度
+			 	 	 	 var oldWidth=oDiv.offsetWidth;
+			 	 	 	 var oldHeight=oDiv.offsetHeight;
+			 	 	 	 //记录盒子原始位置
+			 	 	 	 var oldX=ev.clientX;
+			 	 	 	 var oldY=ev.clientY;
+			 	 	 	 var oldLeft=oDiv.offsetLeft;
+			 	 	 	 var oldTop=oDiv.offsetTop;
+			 	 	 	 
+			 	 	 	 document.onmousemove=function(e){
+			 	 	 	 	 var ev=e||event;
+			 	 	 	 	 var t_t=oldTop+(ev.clientY-oldTop);
+			 	 	 	 	 var l_l=oldLeft+(ev.clientX-oldLeft);
+			 	 	 	 	 var c_w=document.documentElement.clientWidth-oDiv.offsetWidth;
+			 	 	 	 	 var c_h=document.documentElement.clientHeight-oDiv.offsetHeight;
+			 	 	 	 	 //四条边
+			 	 	 	 	 if(obj.className=="t"){
+			 	 	 	 	 	 oDiv.style.height=oldHeight-(ev.clientY-oldY)+"px";
+			 	 	 	 	 	 if(t_t<5)
+			 	 	 	 	 	    t_t=5;
+			 	 	 	 	 	 oDiv.style.top=t_t+"px";
+			 	 	 	 	 }
+			 	 	 	 	 if(obj.className=="r"){
+			 	 	 	 	 	 oDiv.style.width=oldWidth+(ev.clientX-oldX)+"px";
+			 	 	 	 	 	 if(oldLeft>c_w-5)
+			 	 	 	 	 	    oldLeft=c_w-5;
+			 	 	 	 	 	 oDiv.style.left=oldLeft+"px";
+			 	 	 	 	 }
+			 	 	 	 	 if(obj.className=="b"){
+			 	 	 	 	 	 oDiv.style.height=oldHeight+(ev.clientY-oldY)+"px";
+			 	 	 	 	 	 if(oldTop>c_h-5) 
+			 	 	 	 	 	    oldTop=c_h-5;
+			 	 	 	 	 	 oDiv.style.top=oldTop+"px";
+			 	 	 	 	 }
+			 	 	 	 	 if(obj.className=="l"){
+			 	 	 	 	 	 oDiv.style.width=oldWidth-(ev.clientX-oldX)+"px"; 
+			 	 	 	 	 	 oDiv.style.left=l_l+"px";
+			 	 	 	 	 }
+			 	 	 	 	 
+			 	 	 	 	 //四个角
+			 	 	 	 	 if(obj.className=="tl"){
+			 	 	 	 	 	oDiv.style.width=oldWidth-(ev.clientX-oldX)+"px";
+			 	 	 	 	 	oDiv.style.height=oldHeight-(ev.clientY-oldY)+"px";
+			 	 	 	 	 	if(t_t<5)
+			 	 	 	 	 	  t_t=5;
+			 	 	 	 	 	if(l_l<5)
+			 	 	 	 	 	  l_l=5;
+			 	 	 	 	 	oDiv.style.left=l_l+"px";
+			 	 	 	 	 	oDiv.style.top=t_t+"px";
+			 	 	 	 	 }
+			 	 	 	 	 if(obj.className=="tr"){
+			 	 	 	 	 	oDiv.style.width=oldWidth+(ev.clientX-oldX)+"px";
+			 	 	 	 	 	oDiv.style.height=oldHeight-(ev.clientY-oldY)+"px";
+			 	 	 	 	 	if(t_t<5)
+			 	 	 	 	 	  t_t=5;
+			 	 	 	 	 	if(oldLeft>c_w-5)
+			 	 	 	 	 	    oldLeft=c_w-5;
+			 	 	 	 	 	oDiv.style.left=oldLeft+"px";
+			 	 	 	 	 	oDiv.style.top=t_t+"px";
+			 	 	 	 	 }
+			 	 	 	 	 if(obj.className=="br"){
+			 	 	 	 	 	 oDiv.style.width=oldWidth+(ev.clientX-oldX)+"px";
+			 	 	 	 	 	 oDiv.style.height=oldHeight+(ev.clientY-oldY)+"px";
+			 	 	 	 	 	 if(oldLeft>c_w-5)
+			 	 	 	 	 	    oldLeft=c_w-5;
+			 	 	 	 	 	 if(oldTop>c_h-5)
+			 	 	 	 	 	    oldTop=c_h-5;
+			 	 	 	 	 	 oDiv.style.left=oldLeft+"px";
+			 	 	 	 	 	 oDiv.style.top=oldTop+"px";
+			 	 	 	 	 }
+			 	 	 	 	 if(obj.className=="bl"){
+			 	 	 	 	 	 oDiv.style.width=oldWidth-(ev.clientX-oldX)+"px";
+			 	 	 	 	 	 oDiv.style.height=oldHeight+(ev.clientY-oldY)+"px";
+			 	 	 	 	 	 if(l_l<5)
+			 	 	 	 	 	    l_l=5;
+			 	 	 	 	 	 if(oldTop>c_h-5)
+			 	 	 	 	 	    oldTop=c_h-5;
+			 	 	 	 	 	 oDiv.style.left=l_l+"px";
+			 	 	 	 	 	 oDiv.style.top=oldTop+"px";
+			 	 	 	 	 }
+			 	 	 	 };
+			 	 	  };
+			 	 	  document.onmouseup=function(e){
+			 	 	  	  var ev=e||event;
+			 	 	  	  this.onmousemove=null;
+			 	 	  	  ev.cancelBubble=true;
+			 	 	  };
+			 	 	  return false;
+			 	   }
+			 	 })();
+			 	 (function(){
+			 	 	 var oDiv=document.getElementById("box");
+			 	 	 var obox=document.getElementById("box1");
+			 	 	 var op=oDiv.getElementsByTagName("p")[0];
+			 	 	 obox.onmousedown=function(e){	
+			 	 	 	 var ev=e||event;
+			 	 	 	 var tempY=ev.clientY-this.offsetTop;
+			 	 	 	 document.onmousemove=function(e){
+			 	 	 		 var ev=e||event;
+			 	 	 		 var y=ev.clientY-tempY;
+			 	 	 		 var c_h=oDiv.offsetHeight-obox.offsetHeight;
+			 	 	 		 if(y<0)
+			 	 	 		    y=0;
+			 	 	 		 if(y>c_h)
+			 	 	 		   y=c_h;
+			 	 	 		 obox.style.top=y+"px";
+			 	 	 		 
+			 	 	 		 //计算移动的百分比率
+			 	 	 		 var ot=y/c_h;
+			 	 	 		 //文字移动的比率与滚动条移动的比率相等（equal）
+			 	 	 		 var oe=(oDiv.offsetHeight-op.offsetHeight)*ot;
+			 	 	 		 op.style.top=oe+"px";
+			 	 	 	 };
+			 	 	 	 document.onmouseup=function(){
+			 	 	 		this.onmousemove=null;
+			 	 	 	};
+			 	 	 	 return false;
+			 	 	 };
+			 	 })();
+			 	 (function(){
+			 	 	var oBox=document.getElementById("bot");
+   					var oh= oBox.getElementsByTagName("h5")[0];
+				    var ol= oBox.getElementsByTagName("i")[0];
+				    var oLi = oBox.getElementsByTagName("li");
+				    var oul = oBox.getElementsByTagName("ul")[0];
+				    
+				    //点击盒子时的效果
+				    oBox.onclick=function(e){
+				    	var ev=e||event;
+				    	ev.stopPropagation();
+				    	if(ol.className=="in"){
+				    		ol.className="on";
+				    		oul.style.display="block";
+				    		liHide();
+				    	}else{
+				    		ol.className="in";
+				    		oul.style.display="none";
+				    		liHide();
+				    	}
+				    };
+				    document.onclick=function(){
+				    	ol.className="in";
+				    	oul.style.display="none";
+				    };
+				    
+				    function liHide(){
+				    	for(var i=0;i<oLi.length;i++){
+				    		oLi[i].onmouseover=function(){
+				    			this.className="color";
+				    		};
+				    		oLi[i].onmouseout=function(){
+				    			this.className="";
+				    		};
+				    		oLi[i].onmousedown=function(){
+				    			oh.innerHTML=this.innerHTML;
+				    			ol.className="in";
+				    			oul.style.display="none";
+				    		};
+				    	}
+				    }
+			 	 })();
+			 	 /**
+			 	  * 鼠标移动到图片放大
+			 	  */
+			 	 (function(){
+			 	 	var oDiv=document.getElementById("imgBigLong");
+			 	 	var oImg=oDiv.getElementsByTagName("img");
+			 	 	document.onmousemove=function(e){
+			 	 		var ev=e||event;
+			 	 		for (var i=0;i<oImg.length;i++) {
+				 	 		var tempX=oImg[i].offsetLeft+scrollX+oDiv.offsetLeft+oImg[i].offsetWidth/2;
+				 	 		var tempY=oImg[i].offsetHeight+scrollY+oDiv.offsetHeight+oImg[i].offsetHeight/2;
+				 	 		var x=ev.clientX-tempX;
+				 	 		var y=ev.clientY-tempY;
+				 	 		var z=Math.sqrt(x*x+y*y);
+				 	 		var rate=1-z/600;
+				 	 		if(rate<0.5)
+				 	 			rate=0.5;	
+				 	 		oImg[i].style.width=150*rate+"px";	
+			 	 		}
+			 	 	};
+			 	 })();
+			 	 /**
+			 	  * 双色球开奖
+			 	  */
+			 	 (function(){
+			 	 	 var draw=document.getElementById("draw");
+		              var oli=draw.getElementsByTagName("li");
+		              var obtn=draw.getElementsByTagName("button")[0];
+		              var op=draw.getElementsByTagName("p")[0];
+			 	 	  obtn.onclick=function(){
+			 	 	  	  var douber_ball=[];
+			 	 	  	  var luckly=[];
+			 	 	  	  var count=0;
+			 	 	  	  for (var i=0;i<34;i++) {
+			 	 	  	  	 douber_ball.push(i<10?"0"+i:i);
+			 	 	  	  }  
+			 	 	  	  for (var i = 0; i < 6; i++) {
+			 	 	  	  	 var r=Math.floor(Math.random()*douber_ball.length);
+			 	 	  	  	 var n=douber_ball.splice(r,1); //在原数组基础上抽取6个随机数，抽取一次删掉这个数
+			 	 	  	  	 luckly.push(n);
+			 	 	  	  }
+			 	 	  	  var timer=setInterval(function(){
+			 	 	  	  	 	oli[count].innerHTML=luckly[count];
+			 	 	  	  	 	count++;
+			 	 	  	  	 	op.innerHTML="";
+			 	 	  	  	 	if(count==6){
+			 	 	  	  	 		clearInterval(timer);
+			 	 	  	  	 		op.innerHTML="还剩:"+douber_ball;
+			 	 	  	  	 	}
+			 	 	  	  },500);
+			 	 	  }
+			 	 })();
+			 	 (function(){
+			 	 	var arr=[
+			 	 		["小强","17","男"],
+			 	 		["小明","19","男"],
+			 	 		["小芳","17","女"],
+			 	 		["小言","18","女"],
+			 	 		["小兰","17","女"]
+			 	 	];
+			 	 	var atable=document.createElement("table");
+			 	 	atable.innerHTML="<table><thead><tr><th>姓名</th><th>年龄</th><th>性别</th></tr></thead></table>";
+			 	 	atable.className="twoArr";
+			 	 	var abody=document.createElement("tbody");
+			 	 	for (var i = 0; i < arr.length; i++) {
+			 	 		var atr=document.createElement("tr");
+			 	 		for (var j = 0; j < arr[i].length; j++) {
+			 	 			var atd=document.createElement("td");
+			 	 			atd.innerHTML=arr[i][j];
+			 	 			atr.appendChild(atd);
+			 	 		}
+			 	 			abody.appendChild(atr);
+			 	 	}
+			 	 	atable.appendChild(abody);
+			 	 	document.body.appendChild(atable);
+			 	 })();
+			 	 (function(){
+			 	 	 var oYear=document.getElementsByTagName("select");
+	                 var obtn=document.getElementById("btn");
+	                 var op=document.getElementById("showtime");
+	                 obtn.onclick=function(){
+	                 	var year=oYear[0].value;
+	                 	var month=oYear[1].value-1;
+	                 	var adate=oYear[2].value;
+	                 	//获取现在的时间
+	                 	var oTime=new Date();
+	                 	var beforeTime=oTime.getTime();
+	                 	//获取设置的时间
+	                 	oTime.setFullYear(year,month,adate);
+	                 	var nowTime=oTime.getTime();
+	                 	
+	                 	var dateDifer=nowTime-beforeTime;
+	                 	var intF=dateDifer/(24*60*60*1000);
+	                 	op.innerHTML="相差"+intF+"天";
+	                 }
+			 	 })();
+			 	 /**
+			 	  * 切换几个盒子之间的内容，并只能显示一个
+			 	  */
+			 	 (function(){
+			 	 	var obox=document.getElementById("toggle");
+                    var obtn = obox.getElementsByTagName("button");
+                    var ospan = obox.getElementsByTagName("span");
+                    for (var i = 0; i < obtn.length; i++) {
+                    	obtn[i].show=true;
+                    	obtn[i].index=i;
+                    	if(ospan[i]){
+                    		ospan[i].className="hide";
+                    	}
+                    	obtn[i].onclick=function(){
+                    		if(ospan[this.index].className=="hide"){
+	                			for (var i = 0; i < obtn.length; i++) {
+	                				ospan[i].className="hide";
+	                			}
+		                			ospan[this.index].className="show clear";
+                    		}else{
+	                				ospan[this.index].className="hide";
+                    		}
+                    	};
+                    }
+			 	 })();
+			 });
+		</script>
+	</head>
+	<body>
+		<div class="box">
+		    <span class="t"></span>
+		    <span class="r"></span>
+		    <span class="b"></span>
+		    <span class="l"></span>
+		
+		    <span class="tl"></span>
+		    <span class="tr"></span>
+		    <span class="br"></span>
+		    <span class="bl"></span>
+		
+		    <img src="img/02.jpg" alt="">
+		</div>
+	<div id="box">
+      <div id="box1"></div>
+       <p>
+        ECMAScript是一种由Ecma国际（前身为欧洲计算机制造商协会,英文名称是European Computer Manufacturers Association）通过ECMA-262标准化的脚本程序设计语言。 1998年6月，ECMAScript 2.0版发布。 1999年12月，ECMAScript 3.0版发布，成为JavaScript的通行标准，得到了广泛支持。 2007年10月，ECMAScript 4.0版草案发布，对3.0版做了大幅升级，预计次年8月发布正式版本。草案发布后，由于4.0版的目标过于激进，各方对于是否通过这个标准，发生了严重分歧。
+                         以Yahoo、Microsoft、Google为首的大公司，反对JavaScript的大幅升级，主张小幅改动；以JavaScript创造者Brendan Eich为首的Mozilla公司，则坚持当前的草案。 2008年7月，由于对于下一个版本应该包括哪些功能，各方分歧太大，争论过于激进，ECMA开会决定，中止ECMAScript 4.0的开发，将其中涉及现有功能改善的一小部分，发布为ECMAScript 3.1，而将其他激进的设想扩大范围，放入以后的版本，由于会议的气氛，该版本的项目代号起名为Harmony（和谐）。
+                         以Yahoo、Microsoft、Google为首的大公司，反对JavaScript的大幅升级，主张小幅改动；以JavaScript创造者Brendan Eich为首的Mozilla公司，则坚持当前的草案。 2008年7月，由于对于下一个版本应该包括哪些功能，各方分歧太大，争论过于激进，ECMA开会决定，中止ECMAScript 4.0的开发，将其中涉及现有功能改善的一小部分，发布为ECMAScript 3.1，而将其他激进的设想扩大范围，放入以后的版本，由于会议的气氛，该版本的项目代号起名为Harmony（和谐）。
+                         以Yahoo、Microsoft、Google为首的大公司，反对JavaScript的大幅升级，主张小幅改动；以JavaScript创造者Brendan Eich为首的Mozilla公司，则坚持当前的草案。 2008年7月，由于对于下一个版本应该包括哪些功能，各方分歧太大，争论过于激进，ECMA开会决定，中止ECMAScript 4.0的开发，将其中涉及现有功能改善的一小部分，发布为ECMAScript 3.1，而将其他激进的设想扩大范围，放入以后的版本，由于会议的气氛，该版本的项目代号起名为Harmony（和谐）。
+                         以Yahoo、Microsoft、Google为首的大公司，反对JavaScript的大幅升级，主张小幅改动；以JavaScript创造者Brendan Eich为首的Mozilla公司，则坚持当前的草案。 2008年7月，由于对于下一个版本应该包括哪些功能，各方分歧太大，争论过于激进，ECMA开会决定，中止ECMAScript 4.0的开发，将其中涉及现有功能改善的一小部分，发布为ECMAScript 3.1，而将其他激进的设想扩大范围，放入以后的版本，由于会议的气氛，该版本的项目代号起名为Harmony（和谐）。
+       </p>
+	</div>	 
+	<div id="bot">
+    <h5>点击出现下拉菜单</h5><i class="in"></i>
+      <ul class="oul">
+        <li value="1">下拉一</li>
+        <li value="2">下拉二</li>
+        <li value="3">下拉三</li>
+        <li value="4">下拉四</li>
+        <li value="5">下拉五</li>
+      </ul>
+	</div>
+	<div id="draw">
+         <h1>双色球开奖</h1>
+         <ul>
+             <li>点</li>
+             <li>击</li>
+             <li>开</li>
+             <li>始</li>
+             <li>抽</li>
+             <li>奖</li>
+         </ul>
+         <button class="clear">开始</button>
+         <p></p>
+     </div> 
+	 <div id="imgBigLong">
+        <img src="img/1.png" width="64" />
+        <img src="img/2.png" width="64" />
+        <img src="img/3.png" width="64" />
+        <img src="img/4.png" width="64" />
+        <img src="img/5.png" width="64" />
+   	 </div>
+   	 <form name="forms1">
+	    <select>
+	        <option value="2016">2016</option>
+	        <option value="2017">2017</option>
+	        <option value="2018">2018</option>
+	        <option value="2019">2019</option>
+	        <option value="2020">2020</option>
+	        <option value="2021">2021</option>
+	        <option value="2022">2022</option>
+	        <option value="2023">2023</option>
+	        <option value="2024">2024</option>
+	        <option value="2025">2025</option>
+	    </select><span>年</span>
+	    <select>
+	        <option value="1">01</option>
+	        <option value="2">02</option>
+	        <option value="3">03</option>
+	        <option value="4">04</option>
+	        <option value="5">05</option>
+	        <option value="6">06</option>
+	        <option value="7">07</option>
+	        <option value="8">08</option>
+	        <option value="9">09</option>
+	        <option value="10">10</option>
+	        <option value="11">11</option>
+	        <option value="12">12</option>
+	    </select><span>月</span>
+	    <select>
+	        <option value="1">01</option>
+	        <option value="2">02</option>
+	        <option value="3">03</option>
+	        <option value="4">04</option>
+	        <option value="5">05</option>
+	        <option value="6">06</option>
+	        <option value="7">07</option>
+	        <option value="8">08</option>
+	        <option value="9">09</option>
+	        <option value="10">10</option>
+	        <option value="11">11</option>
+	        <option value="12">12</option>
+	        <option value="13">13</option>
+	        <option value="14">14</option>
+	        <option value="15">15</option>
+	        <option value="16">16</option>
+	        <option value="17">17</option>
+	        <option value="18">18</option>
+	        <option value="19">19</option>
+	        <option value="20">20</option>
+	        <option value="21">21</option>
+	        <option value="22">22</option>
+	        <option value="23">23</option>
+	        <option value="24">24</option>
+	        <option value="25">25</option>
+	        <option value="26">26</option>
+	        <option value="27">27</option>
+	        <option value="28">28</option>
+	        <option value="29">29</option>
+	        <option value="30">30</option>
+	        <option value="31">31</option>
+	    </select><span>日</span>
+		<button type="button" id="btn">计算相差天数</button>
+		<p id="showtime"></p>
+	</form>
+	<div id="toggle">
+		<div class="onBox clear">
+		    <button>A</button>
+		    <button>B</button>
+		    <span>aa</span>
+		    <span>bb</span>
+		</div>
+		<div class="onBox clear">
+		    <button>A</button>
+		    <button>B</button>
+		    <span>aa</span>
+		    <span>bb</span>
+		</div>
+		<div class="onBox clear">
+		    <button>A</button>
+		    <button>B</button>
+		    <span>aa</span>
+		    <span>bb</span>
+		</div>
+	</div>
+	</body>
+</html>

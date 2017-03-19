@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+		*{margin:0;padding:0;}
+	   .clear:after{content:"";display:block;overflow:hidden;visibility:hidden;font-size:0;line-height:0;width:0;height:0;clear: both;}
+	   .clear{zoom:1;clear: both;}
+	   .pg{padding-right:0 !important;}
+	   ul{list-style:none;}
+	   /*日历*/
+	   #countDate{max-width:300px;border:1px solid #ccc;padding:20px;}
+	   #countDate  h3{float:left;padding: 0 60px;}
+	   #countDate  a{float:left;font-size:14px;color:#946D20;	padding: 3px;display: block;}
+	   #countDate ul li{float:left;width:42px;height:40px;line-height:40px;text-align:center;margin-top: 5px;}
+	   #countDate .line li{border-bottom: 1px solid #ccc;}
+	   .ccc{color:#969ba3;}
+	   .orange{color:#fff;background:orange;}
+	   .red{color:red;}
+	   /*大事记*/
+	  .year{ margin-left:100px; border-left:5px solid #d4f4ff; padding-bottom:200px; position:relative;margin-top: 100px;}
+      .year h3{ width:100px; height:100px; border-radius:50%; background:#00E0FC; font-size:25px; position:relative; top:50px; left:-55px; text-align:center; line-height:100px;}
+      .year h4{ width:50px; height:50px; line-height:50px; text-align:center; border-radius:50%; background:#65BFD1; position:relative; top:170px; left:-30px; margin-bottom:50px;}
+      .year dl{ position:relative; top:170px; left:-60px; }
+      .year dt{ margin-bottom:50px;}
+      .year dd{width: 20px;height: 20px;left: 62px;top: 560px;border: 5px solid #7ECDF4;opacity: 0.6;border-radius: 50%;background: #11ADE6;position: absolute; top:0; left:42px; }
+      .year span{ width:200px; min-height:60px; border-radius:3px; border:1px solid #ccc; background:#e5e5e5; position:absolute; top:0; left:50px;}
+	   /*json数据*/
+	  table{border-collapse: collapse;width: 600px;margin-bottom: 30px;}
+      th,td{width: 100px;border: 1px solid #ccc;height: 30px;}
+      td{padding-left: 10px;} 
+      /*马赛克切换图片*/
+     #hideBox{ width:400px; height:260px; border:1px solid #ccc; margin:20px 0; position:relative;}    
+	 button{ border:none; background:#ccc; width:30px; height:30px; margin-left:10px;}
+	 .ac{ background:red; color:#fff;}
+	 .hide{ display:none;}   
+	 /*拖拽物体记录路径*/
+	#saveRoad{margin:20px auto;width: 200px;height:200px;position: relative;}
+	#saveRoad div{width:200px;height:200px; background:red; position:absolute;top:0;left:0;}
+	#remove{ height:40px; width:100px; position:absolute; top:230px;}
+	/*分页*/
+	a{ text-decoration:none; font-size:14px; color:#333;}
+	a:hover{ color:red;}
+	ul{ list-style:none;}
+	.news{ width:400px; margin:100px; padding:20px; border:1px solid #ccc}
+	.newsList li{ height:30px; line-height:30px;}
+	.newsList li span{ float:right; width:80px; text-align:left;*margin-top:-30px;}
+	.page{ padding-top:20px; text-align:center;}
+	.page a,.page span{ padding:8px 10px; margin:0 5px; font-size:12px; cursor:pointer; *margin-top:-2px; background:#ddd;}
+	.page .ac{ color:#fff; background:#900; font-weight:bold;}
+	/*放大镜*/
+    #bigSmall{width: 400px;height: 400px;margin:100px 0 100px 100px;position: relative;}
+    #bigSmall .hidden{width: 400px; height: 400px;}
+    #bigSmall .hidden ul li{display: none;}
+    #bigSmall .hidden ul li>img{width: 100%;height: 400px;}
+    #bigSmall .boxBig{width: 370px;max-height: 200px;position: relative;margin: 20px 0 0 10px;}
+    #bigSmall .boxBig img{width: 50px;height: 50px;float:left;margin-left: 20px;}
+    #bigSmall .boxBig .btn1{width:20px;height: 40px;position: absolute;left: -12px;top:5px;}
+    #bigSmall .boxBig .btn2{width:20px;height: 40px;position: absolute;right: -4px;top:5px;}
+    span.bigBox{width: 100px;height: 150px;background: yellow;opacity: .6;position: absolute;
+    	left: 0;top:0;display: none;cursor: move;}  
+	#changeBox{position:absolute;top: 0; left: 470px; overflow: hidden;}
+    #changeBox img{position: absolute;left: 0;top: 0;display: none;} 
+    .bg{border: 2px solid red;} 
+    /*无缝滚动*/
+    .isMove { width: 400px; height: 260px; overflow: hidden; position: relative; margin: 150px auto 0; background: #ccc; }
+
+	.isMove ol { position: absolute;right: 20px; bottom: 20px; z-index: 2; }
+	.isMove ol li { float: left; margin-right: 3px; display: inline; cursor: pointer; background: #fcf2cf; border: 1px solid #f47500; padding: 2px 6px; color: #d94b01; font-family: arial; font-size: 12px; }
+	.isMove .ac { padding: 3px 8px; font-weight: bold; color: #ffffff; background: #ffb442; position: relative; bottom: 2px; }
+	.isMove ul{ position:relative}
+	.isMove ul li { width: 400px; height: 260px; position:absolute; display:none; top:0}
+	.isMove ul img {width: 400px; height: 260px; }
+	
+	.isMove .moveBtn { width: 40px; height:40px; line-height:35px; font-size:30px;color: #fff; text-align: center;background: #333; opacity:.4; position: absolute; top: 50%; margin-top:-20px; z-index: 2; }
+	.isMove .prev { left: 10px; }
+	.isMove .next { right: 10px; }
+	</style>
+	<script src="js/privte_tools.js"></script>
+	<script>
+	 obj_tools.documentReady(function(){
+	 	/**
+	 	 * 日历
+	 	 */
+	 	(function(){
+	 		 var obox=document.getElementById("countDate");
+	         var oul=document.getElementById("date_list");
+	         var title=document.getElementById("title");
+	         var oa=obox.getElementsByTagName("a");
+	         var now_Date=new Date();
+	         var iNow=0;
+	         function dateFn(iNum){
+		         var nowYear=0; //现在的年份
+		         var nowDate=0; //现在的日期
+		         //实例化日期对象
+		         nowYear=new Date();
+		         nowDate=nowYear.getDate();	//返回当期日期
+		         var nowMonth=nowYear.getMonth()+1; //返回当期月份
+		 		 //设置新的月份
+		 		 var newMonth=nowYear.setMonth(nowMonth+iNum);
+		 		 nowYear.setDate(0); //得到本月的最后一天
+		 		 var newDate=nowYear.getDate();
+		 		 nowYear.setDate(1); //得到下月的第一天
+		 		 var newDay=nowYear.getDay();
+				
+		 		 title.innerHTML = nowYear.getFullYear()+"年"+(nowYear.getMonth()+1)+"月";
+		 		 if(newDay == 0){
+					newDay=7;
+				 }
+		 		 oul.innerHTML="";
+		 		 //插入空白li，上个月的
+		 		 for (var i =1;i < newDay; i++) {
+	 		 		var oLi=document.createElement("li");
+ 		 			oul.appendChild(oLi);
+		 		 }
+		 		 //循环压入天数
+		 		 for (var i =1; i <= newDate; i++) {
+		 		 	var oLi=document.createElement("li");
+					oLi.innerHTML=i;
+		 		 	oul.appendChild(oLi);
+		 		 }
+			 	 var ali=oul.children;
+		 		 //循环加入颜色
+		 		 if(iNum < 0){	
+			 		 for (var i =0; i < newDate+newDay-1; i++) {	
+			 		 	ali[i].className="ccc";
+			 		 }
+		 		 }else if(iNum == 0){
+			 		 for (var i = 0; i < newDate; i++) {
+			 		 	if(ali[i].innerHTML < nowDate){
+			 		 		ali[i].className="ccc";
+			 		 	}else if(ali[i].innerHTML == nowDate){
+			 		 		ali[i].className="orange";
+			 		 	}else if(i % 7 == 5||i % 7 == 6){
+			 		 		ali[i].className="red";
+			 		 	}
+			 		 }
+		 		 }else if(iNum > 0){
+		 		 	for (var i = 0; i < newDate+newDay-1; i++) {
+		 		 		if(i % 7 == 5||i % 7 == 6){
+		 		 			ali[i].className="red";
+		 		 		}
+		 		 	}	
+		 		 }
+	 		 }
+	         dateFn(iNow);
+	         oa[0].onclick=function(){
+	         	iNow--;
+	         	dateFn(iNow);
+	         };
+	         oa[1].onclick=function(){
+	         	iNow++;
+	         	dateFn(iNow);
+	         }
+	 	})();
+	 	/**
+	 	 * 大事记
+	 	 */
+	 	(function(){
+			var time_line=[
+	            {
+	                'year':2018,
+	                'month_list':[
+	                    {
+	                        'month':1,
+	                        'cont':[
+	                            {'day':2,'txt':'大事记内容大容大事记内容大事记内容大事记内容大事记内容'},
+	                            {'day':4,'txt':'大事记内容'},
+	                            {'day':5,'txt':'大事记内容'}
+	                        ]
+	                    },{
+	                        'month':4,
+	                        'cont':[
+	                            {'day':5,'txt':'大事记内容大容大事记内容大事记内容大事记内容大事记内容'},
+	                            {'day':9,'txt':'大事记内容'},
+	                            {'day':12,'txt':'大事记内容'}
+	                        ]
+	                    },
+	                    {
+	                        'month':8,
+	                        'cont':[
+	                            {'day':3,'txt':'大事记内容'},
+	                            {'day':5,'txt':'大事记内容'},
+	                            {'day':6,'txt':'大事记内容'}
+	                        ]
+	                    },{
+	                        'month':8,
+	                        'cont':[
+	                            {'day':3,'txt':'大事记内容'},
+	                            {'day':5,'txt':'大事记内容'},
+	                            {'day':6,'txt':'大事记内容'}
+	                        ]
+	                    }
+	                ]
+	            },
+	
+	            {
+	                'year':2019,
+	                'month_list':[
+	                    {
+	                        'month':2,
+	                        'cont':[
+	                            {'day':2,'txt':'大事记内容'},
+	                            {'day':12,'txt':'大事记内容'},
+	                            {'day':16,'txt':'大事记内容'}
+	                        ]
+	                    },
+	                    {
+	                        'month':6,
+	                        'cont':[
+	                            {'day':2,'txt':'大事记内容大事记内容大事记内容大事记内容大事记内容大事记内容大内容'},
+	                            {'day':12,'txt':'大事记内容'},
+	                            {'day':14,'txt':'大事记内容'}
+	                        ]
+	                    }
+	                ]
+	            },
+	
+	            {
+	                'year':2020,
+	                'month_list':[
+	                    {
+	                        'month':4,
+	                        'cont':[
+	                            {'day':12,'txt':'大事记内容'},
+	                            {'day':23,'txt':'大事记内容'},
+	                            {'day':26,'txt':'大事记内容'}
+	                        ]
+	                    },
+	                    {
+	                        'month':6,
+	                        'cont':[
+	                            {'day':2,'txt':'大事记内容'},
+	                            {'day':13,'txt':'大事记内容'},
+	                            {'day':25,'txt':'大事记内容'}
+	                        ]
+	                    }
+	                ]
+	            }
+	
+	        ];
+	        var odiv=document.createElement("div");
+	 		var html="";
+	 		for (var i = 0; i < time_line.length; i++) {
+	 			 html+='<div class="year">'+
+                         '<h3>'+time_line[i].year+'</h3>'+
+                          '<ul class="month_list">'+'<li>';
+                for(var j=0;j<time_line[i].month_list.length;j++) {
+                      html += '<h4>' + time_line[i].month_list[j].month + '月</h4>';
+                      for (var k = 0; k < time_line[i].month_list[j].cont.length; k++) {
+                          html += '<dl>' + '<dt>' + time_line[i].month_list[j].cont[k].day + '</dt>' + '<dd>' + '<span>' + time_line[i].month_list[j].cont[k].txt + '</span>' + '</dd>' + '</dl>';
+                      }
+                  }
+                html += '</li>' + '</ul>' + '</div>';
+                odiv.innerHTML=html;
+	 		}
+	 		document.body.appendChild(odiv);
+	 	})();
+	 	/**
+	 	 * json格式数组
+	 	 */
+	 	(function(){
+	 		var new_json={
+	 			name:[ "小强","小贱","小明","小米"],
+                age: [18,17,16,17],
+                work:["工人","医生","教师","护士"],
+                fav:["打球","达人秀","打电话","打豆豆"]
+	 		};
+	 		var fragement=document.createDocumentFragment();
+	 		var otable=document.createElement("table");
+	 		var othead=document.createElement("thead");
+	 		var otr=document.createElement("tr");
+	 		for (var key in new_json) {
+	 			var oth=document.createElement("th");
+	 			oth.innerHTML="<th>"+key+"</th>";
+	 			otr.appendChild(oth);
+	 		}
+	 		othead.appendChild(otr);
+	 		otable.appendChild(othead);
+	 		var otbody=document.createElement("tbody");
+			for (var key in new_json) {
+				var otr=document.createElement("tr");
+				otr.innerHTML="<tr>"+"</tr>";
+				for (var i=0;i<new_json[key].length;i++) {
+					var otd=document.createElement("td");
+					otd.innerHTML="<td>"+new_json[key][i]+"</td>";
+					otr.appendChild(otd);
+				}
+				otbody.appendChild(otr);
+				otable.appendChild(otbody);
+				fragement.appendChild(otable);
+			}
+			document.body.appendChild(fragement);
+			
+			var new_arr=[
+				{name:"小强",age:18,work:"工人",fav:"打球"},
+                {name:"小贱",age:17,work:"医生",fav:"达人秀"},
+                {name:"小明",age:16,work:"教师",fav:"打电话"},
+                {name:"小米",age:17,work:"护士",fav:"打豆豆"}
+			];
+			var fragement=document.createDocumentFragment();
+	 		var otable=document.createElement("table");
+	 		var othead=document.createElement("thead");
+	 		var otr=document.createElement("tr");
+	 		for (var key in new_arr[0]) {
+	 			var oth=document.createElement("th");
+	 			oth.innerHTML="<th>"+key+"</th>";
+	 			otr.appendChild(oth);
+	 		}
+	 		othead.appendChild(otr);
+	 		otable.appendChild(othead);
+	 		var otbody=document.createElement("tbody");
+			for (var i=0;i<new_arr.length;i++) {
+				var otr=document.createElement("tr");
+				for (var key in new_arr[i]) {
+					var otd=document.createElement("td");
+					otd.innerHTML="<td>"+new_arr[i][key]+"</td>";	
+					otr.appendChild(otd);
+				}
+					otbody.appendChild(otr);
+					otable.appendChild(otbody);
+					fragement.appendChild(otable);
+			}
+			document.body.appendChild(fragement);
+	 	})();
+	 	/**
+	 	 * 马赛克切换图片
+	 	 */
+	 	(function(){
+	 		var obox=document.getElementById("hideBox");
+	 		var oLi=obox.getElementsByTagName("li");
+	 		var mosaic_row=20; //行数
+	 		var mosaic_col=13;	//列数
+	 		var mosaic_all=mosaic_row*mosaic_col;	//总数
+	 		
+	 		for (var i=oLi.length;i>0;i--) {
+	 			var obtn=document.createElement("button");
+	 			obtn.innerHTML=i;
+	 			obj_tools.insertAfter(obtn,obox);
+	 		}
+	 		
+	 		function changeImg(elm,img,speed){
+	 			var iNum=-1;
+	 			var show=0;
+	 			var w=400/mosaic_row;	//设置每张图片的宽
+	 			var h=260/mosaic_col;	//设置每张图片的列
+	 			
+	 			for (var i=0;i<mosaic_all;i++) {
+	 				var odiv=document.createElement("div");	
+	 				odiv.style.backgroundImage='url("img/'+img+'")';
+	 				odiv.style.width=w+"px";
+	 				odiv.style.height=h+"px";
+	 				odiv.style.position="absolute";
+	 				odiv.style.zIndex=10;
+	 				//换行
+	 				if(i % mosaic_row == 0) iNum++;
+	 				
+	 				odiv.style.left=(i%mosaic_row)*w+"px";
+	 				odiv.style.top=iNum*h+"px";
+	 				odiv.style.backgroundPosition=-((i%mosaic_row)*w)+"px"+" "+-(iNum*h)+"px";
+	 				odiv.style.display="none";
+	 					
+		 			elm.appendChild(odiv); 
+	 			}
+	 			var mosaic=elm.children;	//获取所有
+	 			clearInterval(timer);
+	 			var timer=setInterval(function(){
+	 				mosaic[show].style.display="block";
+	 				show++;
+	 				if(show >= mosaic_all) clearInterval(timer);
+	 			},speed);
+	 			
+	 		}
+	 		var obtn=document.getElementsByTagName("button");
+	 		obtn[0].className="ac";
+	 		for (var i=0;i<obtn.length;i++) {
+	 			obtn[i].index=i;
+	 			obtn[i].onclick=function(){
+	 				for (var i=0;i<oLi.length;i++) {
+	 					oLi[i].style.display="none";
+	 					obtn[i].className="";
+	 				}
+	 					this.className="ac";
+	 					oLi[this.index].style.display="block";
+	 					oLi[this.index].innerHTML="";
+	 					
+	 					changeImg(oLi[this.index],"0"+(parseInt(this.index)+1)+".jpg",1);
+	 			}
+	 		}
+	 	})();
+	 	/**
+	 	 * 拖拽物体记录路径
+	 	 */
+	 	(function(){
+	 		var oDiv=document.getElementById("saveRoad");
+	 		var oBox=oDiv.getElementsByTagName("div")[0];
+	 		var oBtn=document.getElementById("remove");
+	 		var arr=[];	//记录路径
+	 		var timer=null;
+	 		
+	 		oDiv.onmousedown=function(e){
+	 			var ev=e||event;
+	 			var tempX=ev.clientX-oBox.offsetLeft;
+	 			var tempY=ev.clientY-oBox.offsetTop;
+	 			
+	 			arr.push({left:oBox.offsetLeft,top:oBox.offsetTop});	//将路径值压入数组
+	 			
+	 			document.onmousemove=function(e){
+	 				var ev=e||event;
+	 				var l=ev.clientX-tempX;
+	 				var t=ev.clientY-tempY;
+	 				
+	 				oBox.style.left=l+"px";
+	 				oBox.style.top=t+"px";
+	 				
+	 				arr.push({left:l,top:t});
+	 			};
+	 			
+	 			document.onmouseup=function(){
+	 				this.onmousemove=null;
+	 			};
+	 			return false;
+	 		};
+	 		
+	 		oBtn.onclick=function(){
+	 			/*for (let i = arr.length-1; i >= 0; i--) {
+	 				  	timer=setTimeout(function(){	//第一种方法用let设置变量i
+				 			var l=arr[i].left;
+				 			var t=arr[i].top;
+				 			
+				 			oBox.style.left=l+"px";
+				 			oBox.style.top=t+"px";
+	 					},(arr.length-i)*20);	//重放时间，递减
+	 			}*/
+	 			for (var i = arr.length-1; i >= 0; i--) {
+	 				(function(index){	//第二种方法使用自运行传入i的值
+	 					timer=setTimeout(function(){
+	 						var l=arr[index].left;
+	 						var t=arr[index].top;
+	 						
+	 						oBox.style.left=l+"px";
+	 						oBox.style.top=t+"px";
+	 					},(arr.length-index)*20);
+	 				})(i);
+	 			}
+	 		};
+	 	})();
+	 	/**
+	 	 * 分页
+	 	 */
+	 	(function(){
+	 		var news_arr=[
+				{"title":"冬奥会期间京张两地赛区50分钟直达","time":"2016-1-1"},
+				{"title":"6名“北京榜样” 走进武警军营","time":"2016-1-13"},
+				{"title":"北京农村廉洁研究中心成立","time":"2016-1-17"},
+				{"title":"北京初步实现食品安全检测与监测全覆盖","time":"2016-1-20"},
+				{"title":"大兴一仓库失火 近40辆车救援","time":"2016-2-24"},
+				{"title":"起底杨秀珠13年逃亡路：辗转多国 亡命天涯","time":"2016-3-10"},
+				{"title":"大兴一仓库失火 近40辆车救援","time":"2016-3-14"},
+				{"title":"18个月负债12余万元，大学生身陷“连环贷”！","time":"2016-3-18"},
+				{"title":"江苏省人民代表大会常务委员会决定任命名单","time":"2016-3-20"},
+				{"title":"大兴一仓库失火 近40辆车救援","time":"2016-4-4"},
+				{"title":"中国是社会主义建设的典范","time":"2016-4-6"},
+				{"title":"奥运史上首个难民代表团!5名难民运动员赴里约","time":"2016-4-24"},
+				{"title":"三中院试点电子送达诉讼文书 最快仅用半小时","time":"2016-5-2"},
+				{"title":"冬奥会期间京张两地赛区50分钟直达","time":"2016-5-7"},
+				{"title":"6名“北京榜样” 走进武警军营","time":"2016-5-19"},
+				{"title":"北京农村廉洁研究中心成立","time":"2016-5-24"},
+				{"title":"北京初步实现食品安全检测与监测全覆盖","time":"2016-5-30"},
+				{"title":"大兴一仓库失火 近40辆车救援","time":"2016-6-6"},
+				{"title":"起底杨秀珠13年逃亡路：辗转多国 亡命天涯","time":"2016-6-19"},
+				{"title":"大兴一仓库失火 近40辆车救援","time":"2016-6-29"},
+				{"title":"18个月负债12余万元，大学生身陷“连环贷”！","time":"2016-6-30"},
+				{"title":"江苏省人民代表大会常务委员会决定任命名单","time":"2016-7-6"},
+				{"title":"大兴一仓库失火 近40辆车救援","time":"2016-7-15"},
+				{"title":"中国是社会主义建设的典范","time":"2016-7-18"},
+				{"title":"奥运史上首个难民代表团!5名难民运动员赴里约","time":"2016-7-20"},
+				{"title":"大兴一仓库失火 近40辆车救援","time":"2016-7-29"}
+			];
+			var news=document.getElementById("news");
+			var oul=document.createElement("ul");
+			var num=6;	//每页多少行
+			var page=0;
+			oul.className="newsList";
+			news.appendChild(oul);
+			//定义插入的li 传入的参数是几就插入几页
+			function changePage(n){
+				var start=n*num;	//开始位置
+				var end=start+num;	//结束位置
+				
+				oul.innerHTML="";
+				for (var i = start; i < end; i++) {
+					if(news_arr[i]){
+						var oli=document.createElement("li");
+						oli.innerHTML="<a href='javascript:(0);'>"+news_arr[i].title+"<span>"+
+							news_arr[i].time+"</span>";
+						oul.appendChild(oli);
+					}
+				}
+			}
+			changePage(page);
+			oul.style.height=oul.offsetHeight+"px";	//设定高度
+			
+			//插分页
+			var pageList=document.createElement("div");
+			pageList.className="page";
+			if(news_arr.length>num){
+				var html="<span>上一页</span>";
+				
+				var page_num=0;
+				for (var i = 0;i < news_arr.length; i+=num) {
+					page_num++;
+					html+="<a>"+page_num+"</a>";
+				}
+				html+="<span>下一页</span>";
+				pageList.innerHTML=html;
+				news.appendChild(pageList);
+				pageList.children[1].className="ac";
+				
+				var oa=pageList.getElementsByTagName("a");
+				function changeA(page){
+					for (var i = 0;i < oa.length; i++) {
+						oa[i].className="";
+					}
+					oa[page].className="ac";
+				}
+				
+				//给每个a标签做点击判断
+				for (var i = 0;i < oa.length; i++) {
+					oa[i].onclick=function(){
+						page=this.innerHTML-1;
+						changeA(page);
+						changePage(page);
+					};
+				}
+				
+				var ospan=pageList.getElementsByTagName("span");
+				ospan[0].onclick=function(){
+					page--;
+					if(page<0) page=0;
+					changePage(page);
+					changeA(page);
+				};
+				ospan[1].onclick=function(){
+					page++;
+					if(page>oa.length-1) page=oa.length-1;
+					changePage(page);
+					changeA(page);
+				};
+			}
+	 	})();
+	 	/**
+	 	 * 放大镜
+	 	 */
+	 	(function(){
+	 		var oBox=document.getElementById("bigSmall");
+	 		var hidden=oBox.getElementsByClassName("hidden")[0];
+	 		var oLi=hidden.getElementsByTagName("li");
+	 		var oSpan=hidden.getElementsByTagName("span" )[0];
+	 		var timer=null;
+	 		var s=0;	
+	 		var count=0; //计数器，当定时器开启时，显示当前图片
+	 		//先显示第一张图片
+	 		oLi[0].style.display="block";
+	 		//创建新的元素，显示内容
+	 		if(oBox){
+	 			var divBig=document.createElement("div");
+	 			divBig.id="changeBox";
+	 			var divBot=document.createElement("div");
+	 			divBot.className="boxBig";
+	 			var oUl=document.createElement("ul");
+	 			for (var i=0;i<oLi.length;i++) {
+	 				var aImg=document.createElement("img");
+	 				var aLi=document.createElement("li");
+	 				let oImg=document.createElement("img");
+					oImg.setAttribute("src",oLi[i].children[0].getAttribute("src"));
+	 				aLi.appendChild(oImg);
+	 				oUl.appendChild(aLi);
+	 				divBot.appendChild(oUl);
+	 				divBig.appendChild(aImg);
+	 			}
+	 			for (var i=0;i<2;i++) {
+					var oBtn=document.createElement("button");
+					oBtn.className="btn"+(i+1);
+	 				divBot.appendChild(oBtn);
+	 			}
+	 			oBox.appendChild(divBig);
+	 			oBox.appendChild(divBot);
+	 		}
+	 		var changeBox=document.getElementById("changeBox");
+	 		var oImg=changeBox.getElementsByTagName("img");
+	 		var aLi=oBox.getElementsByClassName("boxBig")[0].getElementsByTagName("img");
+	 		aLi[s].className="bg";
+	 		var oBtn=oBox.getElementsByTagName("button");
+	 		oBtn[0].innerHTML="&lang;";
+	 		oBtn[1].innerHTML="&rang;";
+	 		for (var i = 0; i < aLi.length; i++) {
+ 			   aLi[i].index = i;
+               aLi[i].onmouseover = function () {
+       				clearInterval(timer);
+       				s=this.index;
+                    addClass(this.index);
+             	};
+         		aLi[i].onmouseout=function(){
+	               for (var i = 0; i < aLi.length; i++) {
+	                   aLi[i].className = "";
+	               }
+	               this.className="bg";
+           	    };
+	 		}
+	 		//控制动态放大图片移动
+	 		hidden.onmousemove=function(e){
+	 			var ev=e||event;
+	 			var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+                var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+	 			var tempX=ev.clientX+scrollX-oBox.offsetLeft-oSpan.offsetWidth/2;
+	 			var tempY=ev.clientY+scrollY-oBox.offsetTop-oSpan.offsetHeight/2;
+	 			var c_w=this.offsetWidth-oSpan.offsetWidth;
+	 			var c_h=this.offsetHeight-oSpan.offsetHeight;
+				moveAnimate(tempX,tempY,c_w,c_h,s);	
+	 		};hidden.onmouseover=function(){
+				clearInterval(timer);
+ 				showImg(s);
+	 		};hidden.onmouseout=function(){
+				timer=setInterval(animateRun,2000);
+ 				hideImg();
+	 		}; 
+	 		oBtn[0].onclick=function(){
+	 			clearInterval(timer);
+	 			s--;
+	 			if(s < 0)s=0;
+	 			addClass(s);
+	 		};
+	 		oBtn[1].onclick=function(){
+	 			clearInterval(timer);
+	 			s++;
+	 			if(s > oImg.length-1) s=oImg.length-1;
+	 			addClass(s);
+	 		};
+	 		//调用方法，实现放大镜移动
+	 		function moveAnimate(tempX,tempY,c_w,c_h,n){
+	 			if(tempX<0)
+	 				tempX=0;
+	 			if(tempX>c_w)
+	 				tempX=c_w;
+	 			if(tempY<0)
+	 				tempY=0;
+	 			if(tempY>c_h)
+	 				tempY=c_h;
+	 				
+				oSpan.style.left=tempX+"px";
+				oSpan.style.top=tempY+"px";
+				
+				//计算图片移动距离
+				var l_rate=tempX/c_w;
+				var r_rate=tempY/c_h;
+				
+				for (n = 0;n < oImg.length; n++) {
+					oImg[n].setAttribute("src",oLi[n].children[0].getAttribute("src"));
+					
+		 			oImg[n].style.left=(changeBox.offsetWidth-oImg[n].offsetWidth)*l_rate+"px";
+		 			oImg[n].style.top=(changeBox.offsetHeight-oImg[n].offsetHeight)*r_rate+"px";	
+				}
+			}
+	 		//显示大图
+	 		function showImg(n){
+				changeBox.style.width=400+"px";
+				changeBox.style.height=600+"px";
+	 			oSpan.style.display="block";
+	 			addClass(n);	
+	 		}
+	 		//隐藏要显示的大图
+	 		function hideImg(){
+				changeBox.style.width=0;
+				changeBox.style.height=0;
+	 			oSpan.style.display="none";
+	 		}
+	 		//添加边框
+	 		function addClass(n){
+               for (var i = 0; i < oImg.length; i++) {
+                   aLi[i].className = "";
+               	   oLi[i].style.display = "none";
+               	   oImg[i].style.display = "none";
+               }
+               oLi[n].style.display = "block";
+               aLi[n].className = "bg";
+               oImg[n].style.display = "block";
+          }
+	 		clearInterval(timer);
+	 		function animateRun(){
+	 			s++;
+	 			if(s > oImg.length-1) {
+	 				s=0;
+	 			}
+	 			addClass(s);	
+	 		}
+	 		timer=setInterval(animateRun,2000);
+	 		return false;
+	 	})();
+	 	/**
+	 	 * 无缝滚动
+	 	 */
+	 	(function(){
+	 		var oDiv=document.getElementById('slide');
+			var aBtn=oDiv.getElementsByTagName('ol')[0].children;
+			var oUl=oDiv.getElementsByTagName('ul')[0];
+			var aLi=oUl.children;
+			var li_w=obj_tools.getStyle(aLi[0], 'width');//图片的宽度
+			var n=0;//当前显示图片索引
+			var timer=null;
+			var s=0;
+			//先显示第一张图片
+			aLi[n].style.display="block";
+			
+			for (var i = 0; i < aBtn.length; i++) {
+				aBtn[i].index=i;	//发牌照，索引值
+				aBtn[i].onclick=function(){
+					if(n!=this.index){
+						slideItem(n,this.index);
+						n=this.index;
+						s=this.index;
+						changeAc();
+					}
+				};
+			}
+			var oA=oDiv.getElementsByTagName("a");
+			oA[0].onclick=function(){
+				if(n <= 0) {
+					n=aLi.length;
+					slideItem(0,n-1);	//重置到最后一张图
+				}else{
+					slideItem(n,n-1);	
+				}
+				n--;
+				s=n;
+				changeAc();
+			};
+			oA[1].onclick=function(){
+				n++;
+				s=n;
+				if(n > aLi.length-1) {
+					n=0;
+					slideItem(aLi.length-1,n);	//重置到第一张图
+				}else{
+					slideItem(n-1,n);	
+				}
+				changeAc();
+			};
+			oDiv.onmouseover=function(){
+				clearInterval(timer);
+			};
+			oDiv.onmouseout=function(){
+				timer=setInterval(moveAnimate,1500);
+			};
+			//动态改变类名方法
+			function slideItem(a,b){
+				aLi[a].style.display="block";
+				aLi[a].style.left=0;
+				aLi[b].style.display="block";
+				aLi[b].style.left=li_w+"px";
+				obj_tools.moveScreen(aLi[a],"left",-li_w,700);
+				obj_tools.moveScreen(aLi[b],"left",0,700,function(){
+					aLi[a].style.display="none";
+				});
+			}
+			//改变点击框
+			function changeAc(){
+				for (var i = 0; i < aBtn.length; i++) {
+					aBtn[i].className="";
+				}
+				aBtn[n].className="ac";
+			}
+			//幻灯片
+			function moveAnimate(){
+				s++;
+				n++;
+				if(s > aLi.length-1) {
+					n=0;
+					s=0;
+					slideItem(aLi.length-1,s);
+				}else{
+					slideItem(s-1,s);	
+				}
+				changeAc();
+			}
+			timer=setInterval(moveAnimate,1500);
+	 	})();
+	 	/**
+             * 调用json
+             */
+            (function(){
+              var obtn=document.getElementById("btn");
+              var obox=document.getElementById("json_box");
+              obtn.onclick = function(){
+              obj_tools.getJson({method:"GET",url:"json/new_json.json",success:function(data){
+                  var content="";
+                  content+="<table>";
+                  content+="<tr><td>"+"姓名："+"</td>"+"<td>"+data.name+"</td></tr>"+
+                          "<tr><td>"+"年龄："+"</td>"+"<td>"+data.age+"</td></tr>"+
+                          "<tr><td>"+"职业："+"</td>"+"<td>"+data.work+"</td></tr>";
+                  content+="</table>";        
+                  obox.innerHTML = content;
+              },con:true});
+            };
+            })();
+	 });
+	</script>
+	<body>
+	    <!--日历-->
+	    <div id="countDate">
+	            <a href="javascript:;">上月</a>
+	            <h3 id="title"></h3>
+	            <a href="javascript:;">下月</a>
+	        <ul class="line clear">
+	          <li>一</li>
+	          <li>二</li>
+	          <li>三</li>
+	          <li>四</li>
+	          <li>五</li>
+	          <li>六</li>
+	          <li class="pg">日</li>
+	        </ul>
+	           <ul id="date_list" class="clear">
+	           </ul>
+	    </div>
+	    <!--马赛克切换图片-->
+	    <div id="hideBox">
+	    	<ul>
+	    		<li><img src="img/01.jpg" alt="" /></li>
+	    		<li class="hide"><img src="img/02.jpg" alt=""/></li>
+	    		<li class="hide"><img src="img/03.jpg" alt="" /></li>
+	    		<li class="hide"><img src="img/04.jpg" alt="" /></li>
+	    		<li class="hide"><img src="img/05.jpg" alt="" /></li>
+	    	</ul>
+	    </div>
+	    <!--拖拽物体记录路径-->
+	   	<div id="saveRoad">
+	   		<button type="button" id="remove">回放</button>
+			<div></div>
+	   	</div>
+	   	<!--分页-->
+		<div id="news" class="news"></div>
+		<!--放大镜多页效果-->
+		<div id="bigSmall">
+			<div class="hidden">
+				<ul>
+					<li><img src="img/background/personal0.jpg" alt="" /></li>
+					<li><img src="img/background/personal1.jpg" alt="" /></li>
+					<li><img src="img/background/personal2.jpg" alt="" /></li>
+					<li><img src="img/background/personal3.jpg" alt="" /></li>
+					<li><img src="img/background/personal4.jpg" alt="" /></li>
+				</ul>
+				<span class="bigBox"></span>
+			</div>	
+		</div>
+		<!--无缝滚动-->
+		<div class="isMove" id="slide">
+		    <a id="prevBtn" href="javascript:;" class="moveBtn prev">&laquo;</a>
+		    <a id="nextBtn" href="javascript:;" class="moveBtn next">&raquo;</a>
+		    <ol>
+		        <li class="ac">1</li>
+		        <li>2</li>
+		        <li>3</li>
+		        <li>4</li>
+		        <li>5</li>
+		    </ol>
+		    <ul>
+		        <li class="1"><a href="javascript:;"><img src="img/01.jpg" alt="广告一" /></a></li>
+		        <li class="2"><a href="javascript:;"><img src="img/02.jpg" alt="广告二" /></a></li>
+		        <li class="3"><a href="javascript:;"><img src="img/03.jpg" alt="广告三" /></a></li>
+		        <li class="4"><a href="javascript:;"><img src="img/04.jpg" alt="广告四" /></a></li>
+		        <li class="5"><a href="javascript:;"><img src="img/05.jpg" alt="广告五" /></a></li>
+		    </ul>
+		</div>
+		<button type="button" id="btn">获取json</button>
+    	<div id="json_box"></div>
+	</body>
+</html>
